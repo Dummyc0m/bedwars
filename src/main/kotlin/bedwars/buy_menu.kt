@@ -1,13 +1,7 @@
 package bedwars
 
-import com.dummyc0m.pylon.app.component.AppRoot
-import com.dummyc0m.pylon.app.component.Component
-import com.dummyc0m.pylon.app.component.RootComponent
-import com.dummyc0m.pylon.app.component.bootstrapApp
-import com.dummyc0m.pylon.app.view.RootElement
-import com.dummyc0m.pylon.app.view.ViewElement
-import com.dummyc0m.pylon.app.view.container
-import com.dummyc0m.pylon.app.view.root
+import com.dummyc0m.pylon.app.component.*
+import com.dummyc0m.pylon.app.view.*
 import com.dummyc0m.pylon.util.RESET
 import com.dummyc0m.pylon.util.itemBuilder
 import org.bukkit.Material
@@ -32,49 +26,43 @@ private object HomeRoute : BuyRoute()
 private object BlockRoute : BuyRoute()
 private object ToolRoute : BuyRoute()
 private object ArmorRoute : BuyRoute()
+private object UtilRoute : BuyRoute()
 
 class NavBar(app: AppRoot, private val routeCallback: (BuyRoute) -> Unit) : Component(app) {
     fun render(currentRoute: BuyRoute): ViewElement {
+        val enchantRoute: ItemElement.(BuyRoute) -> Unit = {
+            if (currentRoute == it) {
+                enchant(Enchantment.SILK_TOUCH, 1)
+                flag(ItemFlag.HIDE_ENCHANTS)
+            } else {
+                onClick { _, _ -> routeCallback(it) }
+            }
+        }
         return container {
             i(0, 0) {
                 material = Material.NETHER_STAR
                 displayName = "${RESET}Home"
-                if (currentRoute == HomeRoute) {
-                    enchant(Enchantment.SILK_TOUCH, 1)
-                    flag(ItemFlag.HIDE_ENCHANTS)
-                } else {
-                    onClick { _, _ -> routeCallback(HomeRoute) }
-                }
+                enchantRoute(HomeRoute)
             }
             i(1, 0) {
                 material = Material.ENDER_STONE
                 displayName = "${RESET}Blocks"
-                if (currentRoute == BlockRoute) {
-                    enchant(Enchantment.SILK_TOUCH, 1)
-                    flag(ItemFlag.HIDE_ENCHANTS)
-                } else {
-                    onClick { _, _ -> routeCallback(BlockRoute) }
-                }
+                enchantRoute(BlockRoute)
             }
             i(2, 0) {
                 material = Material.DIAMOND_PICKAXE
                 displayName = "${RESET}Tools"
-                if (currentRoute == ToolRoute) {
-                    enchant(Enchantment.SILK_TOUCH, 1)
-                    flag(ItemFlag.HIDE_ENCHANTS)
-                } else {
-                    onClick { _, _ -> routeCallback(ToolRoute) }
-                }
+                enchantRoute(ToolRoute)
             }
             i(3, 0) {
                 material = Material.DIAMOND_LEGGINGS
                 displayName = "${RESET}Armor"
-                if (currentRoute == ArmorRoute) {
-                    enchant(Enchantment.SILK_TOUCH, 1)
-                    flag(ItemFlag.HIDE_ENCHANTS)
-                } else {
-                    onClick { _, _ -> routeCallback(ArmorRoute) }
-                }
+                enchantRoute(ArmorRoute)
+            }
+            i(4, 0) {
+                material = Material.TNT
+                displayName = "${RESET}Utility"
+                enchantRoute(UtilRoute)
             }
         }
     }
@@ -100,6 +88,7 @@ class BuyNav(app: AppRoot, buyConfig: BuyConfig, player: Player) : RootComponent
     private val buyBlock = BuyBlock(app, woolColor, buyConfig, player)
     private val buyTools = BuyTools(app, buyConfig, player)
     private val buyArmor = BuyArmor(app, buyConfig, player)
+    private val buyUtil = BuyUtil(app, buyConfig, player)
 
     override fun render(): RootElement {
         return root(container {
@@ -139,6 +128,7 @@ class BuyNav(app: AppRoot, buyConfig: BuyConfig, player: Player) : RootComponent
                     BlockRoute -> buyBlock.render()
                     ToolRoute -> buyTools.render()
                     ArmorRoute -> buyArmor.render()
+                    UtilRoute -> buyUtil.render()
                 })
             }
         }) {
@@ -149,21 +139,21 @@ class BuyNav(app: AppRoot, buyConfig: BuyConfig, player: Player) : RootComponent
     }
 }
 
-class BuyHome(app: AppRoot, woolColor: Short, buyConfig: BuyConfig, player: Player) : Component(app) {
+class BuyHome(app: AppRoot, woolColor: Short, buyConfig: BuyConfig, player: Player) : Component(app), Renderable {
     private val wool = PurchasableItem(app, buyConfig, player, itemBuilder {
         material = Material.WOOL
         damage = woolColor
         amount = 16
     }, buyConfig.woolCost)
 
-    fun render(): ViewElement {
+    override fun render(): ViewElement {
         return container {
             h(wool.render())
         }
     }
 }
 
-class BuyBlock(app: AppRoot, woolColor: Short, buyConfig: BuyConfig, player: Player) : Component(app) {
+class BuyBlock(app: AppRoot, woolColor: Short, buyConfig: BuyConfig, player: Player) : Component(app), Renderable {
     private val wool = PurchasableItem(app, buyConfig, player, itemBuilder {
         material = Material.WOOL
         damage = woolColor
@@ -172,7 +162,7 @@ class BuyBlock(app: AppRoot, woolColor: Short, buyConfig: BuyConfig, player: Pla
 
     private val endStone = PurchasableItem(app, buyConfig, player, bedwars.endStone, buyConfig.endStoneCost)
 
-    fun render(): ViewElement {
+    override fun render(): ViewElement {
         return container {
             c(0, 0) {
                 h(wool.render())

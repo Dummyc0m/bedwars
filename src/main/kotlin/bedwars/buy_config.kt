@@ -35,7 +35,12 @@ fun initBuyConfig(
                 ironAxeCost = Resource(gold, 3),
                 diamondAxeCost = Resource(gold, 6),
 
-                shearsCost = Resource(iron, 20)
+                shearsCost = Resource(iron, 20),
+                enderPearlCost = Resource(emerald, 4),
+                tntCost = Resource(gold, 8),
+                fireballCost = Resource(iron, 40),
+                goldenAppleCost = Resource(gold, 3),
+                waterBucketCost = Resource(gold, 6)
         )
 
 data class Resource(
@@ -85,5 +90,11 @@ data class BuyConfig(
         val ironAxeCost: Resource,
         val diamondAxeCost: Resource,
 
-        val shearsCost: Resource
+        val shearsCost: Resource,
+
+        val enderPearlCost: Resource,
+        val tntCost: Resource,
+        val fireballCost: Resource,
+        val goldenAppleCost: Resource,
+        val waterBucketCost: Resource
 )
